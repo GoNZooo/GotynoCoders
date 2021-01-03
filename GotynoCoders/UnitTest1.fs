@@ -1,6 +1,6 @@
 module Program
 
-open Expecto
+open Fuchu
 open Thoth.Json.Net
 
 [<Tests>]
@@ -20,9 +20,9 @@ let tests =
               let errorDescription =
                   "Error at: `$`\nThe following `failure` occurred with the decoder: Expected literal string with value 'passingData', got 'passingData1'"
 
-              Expect.equal passingResult (Ok "passingData") "Passing result should be `Ok` with same value"
-              Expect.equal failingResult (Error errorDescription) "Failing result should have error description"
+              Assert.Equal("Passing result should be `Ok` with same value", passingResult, (Ok "passingData"))
+              Assert.Equal("Failing result should have error description", failingResult, (Error errorDescription))
           } ]
 
 [<EntryPoint>]
-let main arguments = runTestsWithCLIArgs [] arguments tests
+let main arguments = defaultMainThisAssembly arguments
