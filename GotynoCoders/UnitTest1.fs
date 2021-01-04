@@ -18,7 +18,7 @@ let tests =
               let failingResult = Decode.fromString decoder failingValue
 
               let errorDescription =
-                  "Error at: `$`\nThe following `failure` occurred with the decoder: Expected literal string with value 'passingData', got 'passingData1'"
+                  "Error at: `$`\nThe following `failure` occurred with the decoder: Expected literal value \"passingData\", got: \"passingData1\""
 
               Assert.Equal("Passing result should be `Ok` with same value", passingResult, (Ok "passingData"))
               Assert.Equal("Failing result should have error description", failingResult, (Error errorDescription))
