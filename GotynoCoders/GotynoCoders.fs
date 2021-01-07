@@ -32,12 +32,12 @@ let decodeWithTypeTag tagField (specification: DecoderSpecification<'a>): Decode
         | None ->
             let specificationTags =
                 specification
-                |> Array.map fst
+                |> Array.fold (fun array (t, _) -> Array.append array [| (sprintf "'%s'" t) |]) Array.empty
                 |> String.concat ", "
 
             Decode.fail
                 (sprintf
-                    "Found tag does not match any in specification, expecting one of %A, got: %s"
+                    "Found tag does not match any in specification, expecting one of %s, got: %s"
                      specificationTags
                      foundTag)
 
