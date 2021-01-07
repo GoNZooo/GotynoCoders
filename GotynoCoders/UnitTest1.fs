@@ -24,6 +24,7 @@ type TwoPayload =
 type OneTwoUnion =
     | One of OnePayload
     | Two of TwoPayload
+    | NoPayload
 
     static member OneDecoder: Decoder<OneTwoUnion> =
         Decode.object (fun get -> One(get.Required.Field "data" OnePayload.Decoder))
@@ -31,11 +32,14 @@ type OneTwoUnion =
     static member TwoDecoder: Decoder<OneTwoUnion> =
         Decode.object (fun get -> Two(get.Required.Field "data" TwoPayload.Decoder))
 
+    static member NoPayloadDecoder: Decoder<OneTwoUnion> = Decode.succeed NoPayload
+
     static member Decoder: Decoder<OneTwoUnion> =
         GotynoCoders.decodeWithTypeTag
             "kind"
             [| "One", OneTwoUnion.OneDecoder
-               "Two", OneTwoUnion.TwoDecoder |]
+               "Two", OneTwoUnion.TwoDecoder
+               "NoPayload", OneTwoUnion.NoPayloadDecoder |]
 
     static member Encoder =
         function
@@ -45,6 +49,7 @@ type OneTwoUnion =
         | Two payload ->
             Encode.object [ "kind", Encode.string "Two"
                             "data", TwoPayload.Encoder payload ]
+        | NoPayload -> Encode.object [ "kind", Encode.string "NoPayload" ]
 
 [<Tests>]
 let tests =
@@ -92,6 +97,19 @@ let tests =
               let passingUnionResult =
                   Decode.fromString unionDecoder passingUnionValue
 
+              Assert.Equal
+                  ("Union decoding result with payload passes", passingUnionResult, (Ok(One { OneField = 42u })))
+
+              let passingEmptyUnionValue =
+                  NoPayload
+                  |> OneTwoUnion.Encoder
+                  |> Encode.toString 2
+
+              let passingEmptyUnionResult =
+                  Decode.fromString unionDecoder passingEmptyUnionValue
+
+              Assert.Equal("Union decoding result without payload case passes", passingEmptyUnionResult, (Ok NoPayload))
+
               let failingUnionValue =
                   Encode.object [ "kind", Encode.string "InvalidTag"
                                   "data", Encode.object [ "/shrug", Encode.string "value" ] ]
@@ -101,9 +119,8 @@ let tests =
                   Decode.fromString unionDecoder failingUnionValue
 
               let errorString =
-                  "Error at: `$`\nThe following `failure` occurred with the decoder: Found tag does not match any in specification, expecting one of 'One', 'Two', got: InvalidTag"
+                  "Error at: `$`\nThe following `failure` occurred with the decoder: Found tag does not match any in specification, expecting one of 'One', 'Two', 'NoPayload', got: InvalidTag"
 
-              Assert.Equal("Type tag result with `kind` field passes", passingUnionResult, (Ok(One { OneField = 42u })))
               Assert.Equal("Invalid result is invalid :D", failingUnionResult, (Error errorString))
           } ]
 
