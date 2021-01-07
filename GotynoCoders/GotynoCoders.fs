@@ -26,7 +26,7 @@ type DecoderPair<'a> = string * Decoder<'a>
 type DecoderSpecification<'a> = DecoderPair<'a> array
 
 let decodeWithTypeTag tagField (specification: DecoderSpecification<'a>): Decoder<'a> =
-    let applyMatchingDecoder (foundTag: string) =
+    let applyMatchingDecoder foundTag =
         match Array.tryFind (fun (t, _) -> t = foundTag) specification with
         | Some (_, decoder) -> decoder
         | None ->
