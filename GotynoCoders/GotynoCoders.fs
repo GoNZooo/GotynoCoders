@@ -26,6 +26,8 @@ type DecoderPair<'a> = string * Decoder<'a>
 
 type DecoderSpecification<'a> = DecoderPair<'a> array
 
+/// Decodes a tag field inside an object and looks up which decoder to apply to the structure, given an associative
+/// list of type tags and decoders. This can be useful for decoding unions.
 let decodeWithTypeTag tagField (specification: DecoderSpecification<'a>): Decoder<'a> =
     let applyMatchingDecoder foundTag =
         match Array.tryFind (fun (t, _) -> t = foundTag) specification with
