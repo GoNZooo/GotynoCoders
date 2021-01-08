@@ -18,6 +18,7 @@ let decodeLiteralUnsignedInteger u: Decoder<uint64> = decodeLiteral Decode.uint6
 
 let decodeLiteralSignedInteger i: Decoder<int64> = decodeLiteral Decode.int64 i
 
+/// Decodes a field as a string, meant to contain a type tag
 let decodeTypeTag tagField =
     Decode.object (fun get -> get.Required.Field tagField Decode.string)
 
