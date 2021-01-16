@@ -101,7 +101,7 @@ type Event =
         Decode.object (fun get -> SetEmails(get.Required.Field "data" (Decode.list Email.Decoder)))
 
     static member CloseDecoder: Decoder<Event> =
-        Decode.object (fun get -> Close)
+        Decode.object (fun _get -> Close)
 
     static member Decoder: Decoder<Event> =
         GotynoCoders.decodeWithTypeTag
