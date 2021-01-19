@@ -48,9 +48,9 @@ let decodeWithTypeTag tagField (specification: DecoderSpecification<'a>): Decode
     |> Decode.andThen applyMatchingDecoder
 
 type EnumerationPair<'a, 'b> = 'a * 'b
-    
+
 type EnumerationSpecification<'a, 'b> = EnumerationPair<'a, 'b> array
-    
+
 /// Decodes a value into a base type and compares it to a list of values that all correspond to respective concrete
 /// values, then decodes into that concrete value.
 let decodeOneOf (valueDecoder: Decoder<'a>) (specification: EnumerationSpecification<'a, 'b>): Decoder<'b> =
@@ -62,11 +62,12 @@ let decodeOneOf (valueDecoder: Decoder<'a>) (specification: EnumerationSpecifica
                 specification
                 |> Array.fold (fun array (t, _) -> Array.append array [| (sprintf "'%s'" t) |]) Array.empty
                 |> String.concat ", "
-                
+
             Decode.fail
                 (sprintf
                     "Found tag does not match any in specification, expecting one of %s, got: %s"
                      specificationTags
                      foundValue)
+
     valueDecoder
     |> Decode.andThen useMatchingConstructor
